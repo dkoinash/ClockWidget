@@ -50,22 +50,34 @@ Widget::Calculations()
   int labelNearRadius = labelFarRadius - labelSize;
   m_labels            = makeNetRays(m_center, labelFarRadius, labelNearRadius, 60);
 #pragma region "Часовая стрелка"
-  m_polygonArrowHour << QPoint(-1, -1) << QPoint(1, -1)
-                     << QPoint(1, -labelNearRadius * ARROW_HOUR_SIZE / 100)
-                     << QPoint(-1, -labelNearRadius * ARROW_HOUR_SIZE / 100);
+  m_polygonArrowHour << QPoint(0, -labelNearRadius * ARROWs_CENTER_OFFSET / 100)
+                     << QPoint(0, -labelNearRadius * ARROWS_OFFSET / 100)
+                     << QPoint(ARROW_HOUR_WIDTH / 2, -labelNearRadius * ARROWS_OFFSET / 100)
+                     << QPoint(ARROW_HOUR_WIDTH / 2, -labelNearRadius * ARROW_HOUR_SIZE / 100)
+                     << QPoint(-ARROW_HOUR_WIDTH / 2, -labelNearRadius * ARROW_HOUR_SIZE / 100)
+                     << QPoint(-ARROW_HOUR_WIDTH / 2, -labelNearRadius * ARROWS_OFFSET / 100)
+                     << QPoint(0, -labelNearRadius * ARROWS_OFFSET / 100);
 #pragma endregion
 #pragma region "Минутная стрелка"
-  m_polygonArrowMinute << QPoint(-1, -1) << QPoint(1, -1)
-                       << QPoint(1, -labelNearRadius * ARROW_MINUTE_SIZE / 100)
-                       << QPoint(-1, -labelNearRadius * ARROW_MINUTE_SIZE / 100);
+  m_polygonArrowMinute << QPoint(0, -labelNearRadius * ARROWs_CENTER_OFFSET / 100)
+                       << QPoint(0, -labelNearRadius * ARROWS_OFFSET / 100)
+                       << QPoint(ARROW_MINUTE_WIDTH / 2, -labelNearRadius * ARROWS_OFFSET / 100)
+                       << QPoint(ARROW_MINUTE_WIDTH / 2, -labelNearRadius * ARROW_MINUTE_SIZE / 100)
+                       << QPoint(-ARROW_MINUTE_WIDTH / 2,
+                                 -labelNearRadius * ARROW_MINUTE_SIZE / 100)
+                       << QPoint(-ARROW_MINUTE_WIDTH / 2, -labelNearRadius * ARROWS_OFFSET / 100)
+                       << QPoint(0, -labelNearRadius * ARROWS_OFFSET / 100);
 #pragma endregion
 #pragma region "Секундная стрелка"
-  m_polygonArrowSecond << QPoint(0, 0) << QPoint(0, -labelNearRadius + ARROW_SECOND_OFFSET)
-                       << QPoint(ARROW_SECOND_OFFSET, -labelNearRadius + ARROW_SECOND_OFFSET)
-                       << QPoint(ARROW_SECOND_OFFSET, -labelFarRadius - ARROW_SECOND_OFFSET)
-                       << QPoint(-ARROW_SECOND_OFFSET, -labelFarRadius - ARROW_SECOND_OFFSET)
-                       << QPoint(-ARROW_SECOND_OFFSET, -labelNearRadius + ARROW_SECOND_OFFSET)
-                       << QPoint(0, -labelNearRadius + ARROW_SECOND_OFFSET);
+  // m_polygonArrowSecond << QPoint(0, -labelNearRadius * ARROWs_CENTER_OFFSET / 100)
+  //                      << QPoint(0, -labelNearRadius * ARROW_SECOND_OFFSET / 100)
+  //                      << QPoint(ARROW_SECOND_OFFSET, -labelNearRadius + ARROW_SECOND_OFFSET)
+  //                      << QPoint(ARROW_SECOND_OFFSET, -labelFarRadius - ARROW_SECOND_OFFSET)
+  //                      << QPoint(-ARROW_SECOND_OFFSET, -labelFarRadius - ARROW_SECOND_OFFSET)
+  //                      << QPoint(-ARROW_SECOND_OFFSET, -labelNearRadius + ARROW_SECOND_OFFSET)
+  //                      << QPoint(0, -labelNearRadius + ARROW_SECOND_OFFSET);
+  m_lineArrowSecond = QLine(QPoint(0, -labelNearRadius * ARROWs_CENTER_OFFSET / 100),
+                            QPoint(0, -labelNearRadius * ARROW_SECOND_SIZE / 100));
 #pragma endregion
 }
 
@@ -117,34 +129,41 @@ Widget::paintEvent(QPaintEvent* event)
 
 #pragma region "Часовая стрелка"
   painter.save();
+  painter.setRenderHint(QPainter::Antialiasing);
+  painter.setRenderHint(QPainter::TextAntialiasing);
   painter.translate(m_center);
   painter.rotate(currentTimeHour * 30 + currentTimeMinute / 2);
-  pen.setColor(m_colorMainArrows);
+  pen.setColor(m_colorHourArrow);
   pen.setStyle(Qt::SolidLine);
   painter.setPen(pen);
-  painter.setBrush(m_colorMainArrows);
+  // painter.setBrush(m_colorMainArrows);
   painter.drawPolygon(m_polygonArrowHour);
   painter.restore();
 #pragma endregion
 #pragma region "Минутная стрелка"
   painter.save();
+  painter.setRenderHint(QPainter::Antialiasing);
+  painter.setRenderHint(QPainter::TextAntialiasing);
   painter.translate(m_center);
   painter.rotate(currentTimeMinute * 6 + currentTimeSecond / 10);
-  pen.setColor(m_colorMainArrows);
+  pen.setColor(m_colorMinuteArrow);
   pen.setStyle(Qt::SolidLine);
   painter.setPen(pen);
-  painter.setBrush(m_colorMainArrows);
+  // painter.setBrush(m_colorMainArrows);
   painter.drawPolygon(m_polygonArrowMinute);
   painter.restore();
 #pragma endregion
 #pragma region "Секундная стрелка"
   painter.save();
+  painter.setRenderHint(QPainter::Antialiasing);
+  painter.setRenderHint(QPainter::TextAntialiasing);
   painter.translate(m_center);
   painter.rotate(currentTimeSecond * 6 + currentTimeMSec * 6 / 1000);
   pen.setColor(m_colorSecondArrow);
   pen.setStyle(Qt::SolidLine);
   painter.setPen(pen);
-  painter.drawPolyline(m_polygonArrowSecond);
+  // painter.drawPolyline(m_polygonArrowSecond);
+  painter.drawLine(m_lineArrowSecond);
   painter.restore();
 #pragma endregion
 
